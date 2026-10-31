@@ -20,6 +20,8 @@ export default function App() {
         <Text style={styles.buttonText}>Like</Text>
       </Pressable>
 
+      <Text style={styles.footer}>© 2026 Zheleu Ergazy</Text>
+
       <StatusBar style="auto" />
     </View>
   );
@@ -46,5 +48,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    fontSize: 14,
+    color: '#626267',
   },
 });
