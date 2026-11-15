@@ -1,22 +1,52 @@
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { router } from 'expo-router';
-import { events } from '../../src/data/events';
 import EventRow from '../../src/components/EventRow';
+import { useEvents } from '../../src/hooks/useEvents';
 
 export default function EventsScreen() {
+  const { data, isPending, isError, error, refetch, isRefetching } = useEvents();
   const [savedIds, setSavedIds] = useState<number[]>([]);
   const [query, setQuery] = useState('');
-
-  const visible = events.filter((e) =>
-    e.title.toLowerCase().includes(query.trim().toLowerCase())
-  );
 
   function toggleSaved(id: number) {
     setSavedIds((ids) =>
       ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
     );
   }
+
+  if (isPending) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#005BB5" />
+        <Text style={styles.status}>Loading events</Text>
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorTitle}>Could not load events</Text>
+        <Text style={styles.status}>{error.message}</Text>
+        <Pressable style={styles.button} onPress={() => refetch()}>
+          <Text style={styles.buttonText}>Try again</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const visible = data.filter((e) =>
+    e.title.toLowerCase().includes(query.trim().toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
@@ -32,6 +62,8 @@ export default function EventsScreen() {
       <FlatList
         data={visible}
         keyExtractor={(e) => String(e.id)}
+        refreshing={isRefetching}
+        onRefresh={() => refetch()}
         renderItem={({ item }) => (
           <EventRow
             event={item}
@@ -51,6 +83,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f7fa',
     paddingTop: 12,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: '#f5f7fa',
+  },
+  status: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#626267',
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  button: {
+    marginTop: 20,
+    minHeight: 44,
+    minWidth: 120,
+    paddingHorizontal: 16,
+    backgroundColor: '#005BB5',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
   },
   search: {
     minHeight: 44,

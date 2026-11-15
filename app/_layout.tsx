@@ -1,16 +1,21 @@
 import { Stack } from 'expo-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerTransparent: false,
-        headerStyle: { backgroundColor: '#ffffff' },
-        headerShadowVisible: true,
-      }}
-    >
-      <Stack.Screen name="index" options={{ title: 'Home' }} />
-      <Stack.Screen name="events/index" options={{ title: 'Events' }} />
-    </Stack>
+    <QueryClientProvider client={queryClient}>
+      <Stack
+        screenOptions={{
+          headerTransparent: false,
+          headerStyle: { backgroundColor: '#ffffff' },
+          headerShadowVisible: true,
+        }}
+      >
+        <Stack.Screen name="index" options={{ title: 'Home' }} />
+        <Stack.Screen name="events/index" options={{ title: 'Events' }} />
+      </Stack>
+    </QueryClientProvider>
   );
 }
